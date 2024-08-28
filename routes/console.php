@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Artisan;
 
 //use DefStudio\Telegraph\Models\TelegraphBot;
 
+use \App\Http\Controllers\Controller_sms;
+
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote')->hourly();
@@ -21,4 +23,10 @@ Artisan::command('tester', function () {
     ])->send());*/
 
     dd($telegraphBot->info());
+});
+
+Artisan::command('test_send_sms', function () {
+    $sms = new Controller_sms();
+
+    $sms->send_sms('89879340391', 'Hello world!');
 });

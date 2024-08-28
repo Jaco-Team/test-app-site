@@ -37,6 +37,7 @@ class Controller_concenter extends Controller
 
     public function date_format_new($date){
         $date = explode('-', $date);
+        $m = '';
 
         switch((int)$date[1]){
             case 1:{
@@ -396,7 +397,7 @@ class Controller_concenter extends Controller
         );
 
         return new GlobalResource([
-            'st' => $id > 0 ? true : false,
+            'st' => $id > 0,
             'text' => $id > 0 ? 'Успешно' : 'Ошибка при сохранении',
         ]);
     }
