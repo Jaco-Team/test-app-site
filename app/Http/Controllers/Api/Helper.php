@@ -72,6 +72,29 @@ class Helper
         );
     }
 
+    static function getDopAccessModule($app_id, $module): array
+    {
+        return DB::select(/** @lang text */'
+            SELECT
+                ag.`param`,
+                atg.`value`,
+                ag.`category`
+            FROM
+                jaco_main_rolls.`appointment_group` ag
+                LEFT JOIN jaco_main_rolls.`appointment_template_group` atg
+                    ON
+                        atg.`group_id`=ag.`id`
+                LEFT JOIN jaco_main_rolls.`sklad_modules` sm
+                    ON
+                        sm.`id`=ag.`module_id`
+            WHERE
+                atg.`appointment_id`= :app_id
+                    AND
+                sm.`key_query`= :module',
+            ['app_id' => $app_id, 'module' => $module]
+        ) ?? [];
+    }
+
     static function get_base($point_id)
     {
         return DB::selectOne(/** @lang text */'

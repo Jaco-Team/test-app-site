@@ -15,7 +15,8 @@ class Controller_concenter extends Controller
         return new GlobalResource([
             'module_info' => $request->module_info,
             'cities' => Model_concenter::get_all_cities(),
-            'points' => Model_concenter::get_all_points()
+            'points' => Model_concenter::get_all_points(),
+            'test' => $request->access
         ]);
     }
 
