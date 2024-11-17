@@ -9,6 +9,8 @@
         "ext-curl": "*",
         "darkaonline/l5-swagger": "^8.6",
         "defstudio/telegraph": "^1.55.1",
+        "kreait/firebase-bundle": "^5.5",
+        "kreait/firebase-php": "^7.15",
         "laravel/framework": "^11.32.0",
         "laravel/octane": "^2.5.9",
         "laravel/sanctum": "^4.0.3",
