@@ -38,7 +38,7 @@ class ModifyRequest
         }else{
             $request->login = Helper::parseToken($request->login);
             $request->login['full'] = Helper::getInfoByMy($request->login['login']);
-            $request->access = Helper::getDopAccessModule($request->login['full']['app_id'], $module_name);
+            $request->access = Helper::getDopAccessModule($request->login['full']->app_id, $module_name);
         }
 
         $request->data = json_decode($request->data, true);
