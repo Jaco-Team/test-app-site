@@ -36,7 +36,8 @@ class Helper
                 u.`inn`,
                 up.`appointment_id` as app_id,
                 app.`type` as app_type,
-                app.`kind`
+                app.`kind`,
+                up.`appointment_id` as app_id
             FROM
                 jaco_main_rolls.`users` u
                 LEFT JOIN jaco_main_rolls.`user_privileges` up
