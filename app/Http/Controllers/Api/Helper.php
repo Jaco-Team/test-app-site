@@ -95,6 +95,16 @@ class Helper
         ) ?? [];
     }
 
+    static function searchAccessModule($id, $category, $array): string|bool
+    {
+        foreach ($array as $val) {
+            if ($val['param'] === $id && $val['category'] === $category) {
+                return $val['value'];
+            }
+        }
+        return false;
+    }
+
     static function get_base($point_id)
     {
         return DB::selectOne(/** @lang text */'
