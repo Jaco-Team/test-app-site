@@ -18,4 +18,5 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+/.osp
 app/Http/Controllers/Api/Firebase.json

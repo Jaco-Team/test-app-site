@@ -2,6 +2,7 @@
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
 
 //use Kreait\Laravel\Firebase\Facades\Firebase;
 use Kreait\Firebase\Contract\Messaging;
@@ -37,11 +38,22 @@ Artisan::command('test_send_sms', function () {
     $sms->send_sms('89879340391', 'Hello world!');
 });
 
-Artisan::command('test_firebase', function () {
-
+//рассылка пушей в приложении для клиентов
+Artisan::command('send_user_push', function () {
 
     //$defaultAuth = Firebase::auth();
     $firebase = new Firebase();
-    $firebase->send();
+    $firebase->send_user_push();
     //dd($result);
 });
+
+//рассылка пушей для клиентов, что заказ готов в кафе
+Artisan::command('send_order_done_push', function () {
+    $firebase = new Firebase();
+    $firebase->send_order_done_push();
+});
+
+Schedule::command('send_user_push')
+    ->everyThirtyMinutes()
+    ->timezone('Europe/Samara')
+    ->between('08:00', '20:00');
