@@ -2,51 +2,206 @@
 
 namespace App\Http\Controllers\Api;
 
+use Illuminate\Support\Facades\DB;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\Factory;
 
 class Firebase
 {
-    public function send()
+
+    //Метод для рассылки через push в приложении для клиентов
+    public function send_user_push()
     {
         //https://firebase-php.readthedocs.io/en/7.15.0/cloud-messaging.html
-        $deviceToken = 'dT49-1Isz0LMrKhpYMIudo:APA91bHo4l4BtndszR0ZTNxZOwSfng4i1ilqDVm6GS0h0iH1jZgKhiWustyqFSW99d7sj41-bGauJPxACuhVV3RKF8FaBUJftean10WC2LSczRgLp8iunEiETpLX81ydJbwQSUKybp4y';
-
-        $deviceTokens = [$deviceToken, $deviceToken];
 
         $firebase = (new Factory)->withServiceAccount(__DIR__.'/Firebase.json');
 
         $messaging = $firebase->createMessaging();
 
-        $message = CloudMessage::fromArray([
-            'token' => $deviceToken,
-            'notification' => [
-                'title' => 'Hello from Firebase!',
-                'body' => 'This is a test notification.'
-            ],
-            'data' => [
-                'title' => 'Hello from Firebase!',
-                'body' => 'This is a test notification.'
-            ],
-            'apns' => [
-                'headers' => [
-                    'apns-priority' => '10',
+        /*
+         * Логика такая: смотрим в БД, какие пуши надо рассылать $pushes,
+         * формируем общий массив с токенами $deviceTokensRaw и массив с токенами для рассылки (пустой) $deviceTokens.
+         * Затем делаем проверку для каждого пуша, высылали ли мы каждому юзеру этот пуш.
+         * Если нет, то добавляем токен в массив $deviceTokens и отправляем пуш.
+         * Пишем в push_appuser_send, что пуш юзеру был отправлен.
+         * После отправки каждого пуша, очищаем массив $deviceTokens.
+         */
+        //Формируем общий массив с токенами
+        $deviceTokensRaw = DB::select('
+            SELECT
+                UNT.`token`, UNT.`user_id`
+            FROM `jaco_main_rolls`.`user_notif_token` UNT
+                LEFT JOIN `jaco_main_rolls`.`site_users` SU
+                ON SU.`id` = UNT.`user_id`
+            WHERE SU.`is_active`= 1
+                AND UNT.`user_id` is not null
+        ');
+        $deviceTokens = [];
+
+        //Список актуальных пушей
+        $pushes = DB::select('
+            SELECT
+                *
+            FROM `jaco_site_rolls`.`push`
+            WHERE `is_active`=1
+                AND `is_send`=1
+                AND `is_auth`=1
+        ');
+        foreach ($pushes as $push) {
+            foreach ($deviceTokensRaw as $deviceTokenRaw) {
+                //Проверяем, высылали ли юзеру этот пуш
+                $push_check = DB::select('
+                    SELECT *
+                    FROM `jaco_site_rolls`.`push_appuser_send` PAS
+                    WHERE PAS.`push_id` = '.$push->id.'
+                        AND PAS.`site_user_id` = '.$deviceTokenRaw->user_id.'
+                        AND PAS.`app_token` = "'.$deviceTokenRaw->token.'"
+                        AND PAS.`is_send`=1
+                ');
+                if (!$push_check) {
+                    echo 'try to send push<br>';
+                    $deviceTokens[] = $deviceTokenRaw->token;
+                    $res = DB::insert('
+                    INSERT INTO `jaco_site_rolls`.`push_appuser_send` (
+                        `push_id`,
+                        `site_user_id`,
+                        `app_token`,
+                        `is_send`
+                    ) VALUES (
+                        '.$push->id.',
+                        '.$deviceTokenRaw->user_id.',
+                        "'.$deviceTokenRaw->token.'",
+                        1
+                    )
+                ');
+                }
+            }
+
+            $message = CloudMessage::fromArray([
+                //    'token' => $deviceToken,
+                'notification' => [
+                    'title' => $push->title,
+                    'body' => $push->text
                 ],
-                'payload' => [
-                    'aps' => [
-                        'sound' => 'default',
-                    ]
+                'data' => [
+                    'title' => $push->title,
+                    'body' => $push->text
                 ],
-            ],
-        ]);
+                'apns' => [
+                    'headers' => [
+                        'apns-priority' => '10',
+                    ],
+                    'payload' => [
+                        'aps' => [
+                            'sound' => 'default',
+                        ]
+                    ],
+                ],
+            ]);
+            if (count($deviceTokens) != 0) {
+                $report = $messaging->sendMulticast($message, $deviceTokens);
+                echo "successes: ";
+                echo $report->successes()->count();
+                echo " / failures: ";
+                echo $report->failures()->count();
+                echo "\n";
+                $deviceTokens = [];
+            } else {
+                echo 'no tokens for push id: '.$push->id. "\n";
+            }
+        }
 
         //$res = $messaging->send($message);
-        $report = $messaging->sendMulticast($message, $deviceTokens);
-
-        echo $report->successes()->count();
-        echo "<br />";
-        echo $report->failures()->count();
-
         //dd($report);
+    }
+
+    //Метод для рассылки через push для клиентов, что заказ готов в кафе
+    public function send_order_done_push(){
+        //https://firebase-php.readthedocs.io/en/7.15.0/cloud-messaging.html
+
+        $firebase = (new Factory)->withServiceAccount(__DIR__.'/Firebase.json');
+
+        $messaging = $firebase->createMessaging();
+
+        $points = DB::select('
+            SELECT
+                `id`,
+                `base`
+            FROM `jaco_main_rolls`.`points`
+            WHERE
+                `is_active`=1
+        ');
+
+        $start = microtime(true);
+
+        while (true) {
+
+            if ( (int)(microtime(true) - $start) > 58 ) {
+                die();
+            }
+
+            foreach ($points as $point) {
+                $app_orders = DB::select('
+                    SELECT
+                        o.`id`,
+                        otn.`notif_token`
+                    FROM
+                        '.$point->base.'.`orders` o
+                        LEFT JOIN '.$point->base.'.`order_types_notif` otn
+                            ON
+                                otn.`order_id` = o.`id`
+                    WHERE
+                        o.`type_order`=2
+                            AND
+                        o.`status_order`=4
+						    AND
+					    o.`is_delete`=0
+                    	    AND
+                        otn.`is_send`=0
+                    	    AND
+                        otn.`notif_token`!=""
+                ') ?? [];
+
+                foreach ($app_orders as $key => $order) {
+
+                    $message = CloudMessage::fromArray([
+                        'token' => $order->notif_token,
+                        'notification' => [
+                            'title' => "Заказ готов!",
+                            'body' => 'Заказ №'.$order->id.' готов и ожидает вас в кафе'
+                        ],
+                        'data' => [
+                            'title' => "Заказ готов!",
+                            'body' => 'Заказ №'.$order->id.' готов и ожидает вас в кафе'
+                        ],
+                        'apns' => [
+                            'headers' => [
+                                'apns-priority' => '10',
+                            ],
+                            'payload' => [
+                                'aps' => [
+                                    'sound' => 'default',
+                                ]
+                            ],
+                        ],
+                    ]);
+
+                    $res = $messaging->send($message);
+
+                    DB::update('
+                        UPDATE
+                            '.$point->base.'.`order_types_notif`
+                        SET
+                            `is_send`=?
+                        WHERE
+                            `order_id`=?
+                        ',
+                        ['1', $order->id],
+                    );
+                }
+            }
+
+            sleep(2);
+        }
     }
 }
