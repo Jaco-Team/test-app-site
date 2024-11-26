@@ -52,6 +52,52 @@ class Helper
         );
     }
 
+    static function getMyPointList($city_id, $point_id): array
+    {
+        if((int)$city_id == -1) {
+            return DB::select(/** @lang text */'
+                SELECT
+                    p.`base`,
+                    CONCAT(c.`name`, ", ", p.`addr`) as name,
+                    p.`id` as id,
+                    p.`city_id`
+                FROM
+                    jaco_main_rolls.`points` p
+                    LEFT JOIN jaco_main_rolls.`cities` c
+                      ON
+                        c.`id`=p.`city_id`
+                WHERE
+                    p.`id`!=0
+                ORDER BY
+                    p.`city_id`'
+            ) ?? [];
+        }else{
+            return DB::select(/** @lang */ '
+                SELECT
+                    p.`base`,
+                    CONCAT(c.`name`, ", ", p.`addr`) as name,
+                    p.`id` as id,
+                    p.`city_id`
+                FROM
+                    jaco_main_rolls.`points` p
+                    LEFT JOIN jaco_main_rolls.`cities` c
+                      ON
+                        c.`id`=p.`city_id`
+                WHERE
+                    p.`city_id`="'.$city_id.'"
+                      AND
+                    ("'.$point_id.'"=-1
+                      OR
+                    p.`id`="'.$point_id.'")
+                      AND
+                    p.`id`!=0
+                ORDER BY
+                    p.`city_id`'
+            ) ?? [];
+        }
+
+    }
+
     static function checkAccesModule($user_id, $module)
     {
         return DB::selectOne(/** @lang text */'
