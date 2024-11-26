@@ -35,6 +35,10 @@ class Firebase
                 ON SU.`id` = UNT.`user_id`
             WHERE SU.`is_active`= 1
                 AND UNT.`user_id` is not null
+                AND
+            SU.`id` in (112565, 103162)
+                AND
+            UNT.`token` != "e4F3Gr3BSO6OpSZHPfKKEI:APA91bEcT-KmHtASJWIs7EAdeEsqBOzRMIgVC9GIDKwaaotn3iRU6ioz4BiA4xdnFQhdTvfb6xtZLZGy5Y3CJpluT7iK4SktBE8xYlaz5EBZ13psx49-XSwm-e-alXRZiM5GvoBsKGqY"
         ');
         $deviceTokens = [];
 
