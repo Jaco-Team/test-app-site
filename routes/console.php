@@ -54,6 +54,6 @@ Artisan::command('send_order_done_push', function () {
 });
 
 Schedule::command('send_user_push')
-    ->everyThirtyMinutes()
+    ->everyFiveMinutes()
     ->timezone('Europe/Samara')
     ->between('08:00', '20:00');
