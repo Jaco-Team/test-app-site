@@ -185,4 +185,20 @@ class Helper
     {
         return base64_decode(str_pad(strtr($data, '-_', '+/'), strlen($data) % 4, '=', STR_PAD_RIGHT));
     }
+
+    static function curl_api($post_data){
+      $ch = curl_init();
+      curl_setopt($ch, CURLOPT_URL, $post_data['api_path']);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+      curl_setopt($ch, CURLOPT_POST, 1);
+      curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+
+      curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+      curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+
+      $output = curl_exec($ch);
+      curl_close($ch);
+      return json_decode($output, JSON_UNESCAPED_UNICODE);
+    }
+
 }
