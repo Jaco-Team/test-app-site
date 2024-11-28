@@ -12,6 +12,7 @@ use App\Http\Controllers\Controller_concenter;
 use App\Http\Controllers\Controller_app_work;
 use App\Http\Controllers\Controller_site_push;
 use App\Http\Controllers\Controller_stat_time_orders;
+use App\Http\Controllers\Controller_site_page_text;
 
 Route::get('/', [IndexController::class, 'index'])->name('home');
 Route::get('/one', [IndexController::class, 'get_last'])->name('home');
@@ -56,6 +57,14 @@ Route::middleware([CheckToken::class])->group(function () {
     Route::prefix('stat_time_orders')->group(function () {
       Route::any('/get_all', [Controller_stat_time_orders::class, 'get_all']);
       Route::any('/get_stat', [Controller_stat_time_orders::class, 'get_stat']);
+    });
+
+    Route::prefix('site_page_text')->group(function () {
+      Route::any('/get_all', [Controller_site_page_text::class, 'get_all']);
+      Route::any('/get_all_for_new', [Controller_site_page_text::class, 'get_all_for_new']);
+      Route::any('/get_one', [Controller_site_page_text::class, 'get_one']);
+      Route::any('/save_new', [Controller_site_page_text::class, 'save_new']);
+      Route::any('/save_edit', [Controller_site_page_text::class, 'save_edit']);
     });
 
 });
