@@ -286,6 +286,18 @@ class Model_stat_time_orders extends Model
       ');
     }
 
+    static function get_time_queue_orders(string $base, string $h): object|null
+    {
+      return DB::selectOne(/** @lang text */'
+        SELECT
+          `time_min`
+        FROM
+          '.$base.'.`time_queue_orders`
+        WHERE
+          `h`="'.$h.'"
+      ');
+    }
+
     static function convert_time(string $time): string
     {
       $sec = (int)((int)$time / 60);
@@ -298,4 +310,5 @@ class Model_stat_time_orders extends Model
 
       return $hours.':'.$minutes;
     }
+
 }

@@ -230,16 +230,15 @@ class Controller_stat_time_orders extends Controller
       foreach($arr_h as $hours){
         $check = false;
 
-//        $hours = (object)$hours;
-
         foreach($unics_hours as $stat){
-          if((int)$stat['h'] == (int)$hours['h']){
+          if((int)$stat->h == (int)$hours['h']){
             $check = true;
           }
         }
 
         if(!$check){
-          $unics_hours[] = array(
+          $unics_hours[] = (object)array(
+            'h' => (int)$hours['h'],
             'all_time_sec' => 0,
             'povar_time_sec' => 0,
             'kassir_time_sec' => 0,
@@ -254,11 +253,33 @@ class Controller_stat_time_orders extends Controller
         }
       }
 
+      $arr_h_new = [];
+
+      foreach($arr_h as $h){
+        $arr_h_new[] = $h;
+      }
+
+      $collection = collect($unics_hours);
+      $sorted = $collection->sortBy('h');
+      $unics_hours = $sorted->values()->all();
+
+      foreach($unics_hours as $h ){
+        $res = Model_stat_time_orders::get_time_queue_orders($base, $h->h);
+        $h->wait = $res->time_min ?? 0;
+      }
+
       return new GlobalResource([
-        '$arr_h' => $arr_h,
-        '$queue_full' => $queue_full,
-        '$unics_hours' => $unics_hours,
-        '$unics_users' => $unics_users
+        'users' => $unics_users,
+        'hours' => $unics_hours,
+        'orders' => $arr_h_new,
+        'full_time_orders' => $full_time_orders,
+        'all_load_time' => $all_load_time,
+        'all_povar_time' => $all_povar_time,
+        'all_kassit_time' => $all_kassit_time,
+        'all_kassit_time_' => $all_kassit_time_,
+        'all_work_time' => $all_work_time,
+        'all_pf_work_time' => $all_pf_work_time,
+        '$queue_full' => $queue_full
       ]);
     }
 
