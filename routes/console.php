@@ -11,6 +11,7 @@ use Kreait\Firebase\Messaging\CloudMessage;
 
 use \App\Http\Controllers\Controller_sms;
 use \App\Http\Controllers\Api\Firebase;
+use App\Http\Controllers\Crone\Controller_app_push_send;
 
 //use Kreait\Laravel\Firebase\Facades\Firebase;
 
@@ -40,20 +41,18 @@ Artisan::command('test_send_sms', function () {
 
 //рассылка пушей в приложении для клиентов
 Artisan::command('send_user_push', function () {
-
-    //$defaultAuth = Firebase::auth();
-    $firebase = new Firebase();
-    $firebase->send_user_push();
-    //dd($result);
+    $send_user_push = new Controller_app_push_send();
+    $send_user_push->send_user_push();
 });
 
 //рассылка пушей для клиентов, что заказ готов в кафе
 Artisan::command('send_order_done_push', function () {
-    $firebase = new Firebase();
+    $firebase = new Controller_app_push_send();
     $firebase->send_order_done_push();
 });
 
+//Планировщик (крон) для рассылки пушей в приложении для клиентов
 Schedule::command('send_user_push')
-    ->everyFiveMinutes()
+    ->everyThirtyMinutes()
     ->timezone('Europe/Samara')
-    ->between('08:00', '20:00');
+    ->between('08:00', '21:00');
