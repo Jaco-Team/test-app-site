@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
+use App\Models\ModelPriceLevelExport;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -13,10 +13,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // ModelPriceLevelExport::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Test User',
+        ModelPriceLevelExport::factory()->create([
+            'name' => 'Test ModelPriceLevelExport',
             'email' => 'test@example.com',
         ]);
     }

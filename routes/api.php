@@ -13,6 +13,7 @@ use App\Http\Controllers\Controller_app_work;
 use App\Http\Controllers\Controller_site_push;
 use App\Http\Controllers\Controller_stat_time_orders;
 use App\Http\Controllers\Controller_site_page_text;
+use App\Http\Controllers\Controller_site_price_level;
 
 Route::get('/', [IndexController::class, 'index'])->name('home');
 Route::get('/one', [IndexController::class, 'get_last'])->name('home');
@@ -65,6 +66,17 @@ Route::middleware([CheckToken::class])->group(function () {
       Route::any('/get_one', [Controller_site_page_text::class, 'get_one']);
       Route::any('/save_new', [Controller_site_page_text::class, 'save_new']);
       Route::any('/save_edit', [Controller_site_page_text::class, 'save_edit']);
+    });
+
+    Route::prefix('site_price_level')->group(function () {
+      Route::any('/get_all', [Controller_site_price_level::class, 'get_all']);
+      Route::any('/get_all_for_new', [Controller_site_price_level::class, 'get_all_for_new']);
+      Route::any('/save_new', [Controller_site_price_level::class, 'save_new']);
+      Route::any('/get_one', [Controller_site_price_level::class, 'get_one']);
+      Route::any('/save_one_price', [Controller_site_price_level::class, 'save_one_price']);
+      Route::any('/save_edit', [Controller_site_price_level::class, 'save_edit']);
+      Route::any('/export_file_xls', [Controller_site_price_level::class, 'export_file_xls']);
+      Route::any('/import_file_xls', [Controller_site_price_level::class, 'import_file_xls']);
     });
 
 });
