@@ -177,12 +177,24 @@ class Controller_site_price_level extends Controller
 
     public function import_file_xls(Request $request)
     {
-      //$contents = $request->all('file');
+        //$contents = $request->all('file');
+
+        /*foreach($request->file('file') as $image) {
+            $filename = time().rand(3, 9). '.'.$image->getClientOriginalExtension();
+            $image->move('uploads/', $filename);
+        }*/
+
+        //return $request->all();
+        //return $request->file;
 
       //$path = Storage::putFile('\storage\app', $request->file('file'));
       //$path = Storage::disk('public')->putFile('avatars', $request->file('file'));
 
-      return $request->all('file');
+        $path = Storage::disk('public')->put('avatars', $request->file );
+
+        return $path;
+
+      //return $request->all('file');
 
 //  Storage::put('form_price_level.xlsx', $contents['file']);
 

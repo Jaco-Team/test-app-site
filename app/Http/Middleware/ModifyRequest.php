@@ -29,7 +29,7 @@ class ModifyRequest
         }else{
             $request->module_info = null;
         }
-  
+
         if( strlen($request->login) == 0 ) {
             $request->login = [
                 'login' => '',
