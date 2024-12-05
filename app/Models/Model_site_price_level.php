@@ -182,12 +182,18 @@ class Model_site_price_level extends Model
     {
       return DB::select(/** @lang text */ '
         SELECT
-          `id`,
-          `name`
+          i.`id`,
+          i.`name`
         FROM
-          jaco_site_rolls.`items`
+          jaco_site_rolls.`items` i
+          LEFT JOIN jaco_site_rolls.`category_new` c2
+            ON
+              i.`category_id2`=c2.`id`
         WHERE
-          `is_show`=1
+          i.`is_show`=1
+        ORDER BY
+          c2.`sort_app` ASC,
+          i.`sort` ASC
       ') ?? [];
     }
 
