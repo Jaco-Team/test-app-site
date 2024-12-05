@@ -102,15 +102,15 @@ class Model_app_push_send extends Model
 
     static function update_order_push_status($order_id, $point_base): void
     {
-      DB::update('
-                        UPDATE
-                            '.$point_base.'.`order_types_notif`
-                        SET
-                            `is_send`=?
-                        WHERE
-                            `order_id`=?
-                        ',
-        ['1', $order_id],
-      );
+        DB::update('
+            UPDATE
+                '.$point_base.'.`order_types_notif`
+            SET
+                `is_send`=?
+            WHERE
+                `order_id`=?
+            ',
+            ['1', $order_id],
+        );
     }
 }
