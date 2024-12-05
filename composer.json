@@ -7,26 +7,26 @@
     "require": {
         "php": "^8.2",
         "ext-curl": "*",
-        "darkaonline/l5-swagger": "^8.6",
-        "defstudio/telegraph": "^1.55.1",
+        "darkaonline/l5-swagger": "^8.6.3",
+        "defstudio/telegraph": "^v1.56.0",
         "kreait/firebase-bundle": "^5.5",
-        "kreait/firebase-php": "^7.15",
-        "laravel/framework": "^11.32.0",
-        "laravel/octane": "^2.5.9",
-        "laravel/sanctum": "^4.0.3",
-        "laravel/tinker": "^2.10",
-        "maatwebsite/excel": "^3.1",
+        "kreait/firebase-php": "^7.16.0",
+        "laravel/framework": "v11.34.2",
+        "laravel/octane": "^v2.6.0",
+        "laravel/sanctum": "^v4.0.5",
+        "laravel/tinker": "^v2.10.0",
+        "maatwebsite/excel": "^3.1.61",
         "nextapps/laravel-swagger-ui": "^1.0",
-        "phpoffice/phpspreadsheet": "^1.29"
+        "phpoffice/phpspreadsheet": "^1.29.5"
     },
     "require-dev": {
-        "fakerphp/faker": "^1.24",
-        "laravel/pint": "^1.18.1",
-        "laravel/sail": "^1.38",
-        "laravel/telescope": "^5.2.5",
+        "fakerphp/faker": "^v1.24.1",
+        "laravel/pint": "^v1.18.3",
+        "laravel/sail": "^v1.39.1",
+        "laravel/telescope": "^v5.2.6",
         "mockery/mockery": "^1.6.12",
-        "nunomaduro/collision": "^8.5",
-        "phpunit/phpunit": "^11.4.3"
+        "nunomaduro/collision": "^v8.5.0",
+        "phpunit/phpunit": "^11.4.4"
     },
     "autoload": {
         "psr-4": {
