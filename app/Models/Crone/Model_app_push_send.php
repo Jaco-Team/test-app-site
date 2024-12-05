@@ -9,6 +9,7 @@ class Model_app_push_send extends Model
 {
 
     //Список активных рассылок, которые нужно отправить
+    //тестовая правка
     static function get_push_active_send_auth(): array
     {
       return DB::select('
