@@ -16,7 +16,8 @@
         "laravel/sanctum": "^4.0.3",
         "laravel/tinker": "^2.10",
         "maatwebsite/excel": "^3.1",
-        "nextapps/laravel-swagger-ui": "^1.0"
+        "nextapps/laravel-swagger-ui": "^1.0",
+        "phpoffice/phpspreadsheet": "^1.29"
     },
     "require-dev": {
         "fakerphp/faker": "^1.24",
