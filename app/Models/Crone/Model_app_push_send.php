@@ -21,7 +21,7 @@ class Model_app_push_send extends Model
         ') ?? [];
     }
 
-    //Список токенов для рассылки
+    //Список токенов для рассылки тест!
     static function get_device_tokens(): array
     {
       return DB::select('
