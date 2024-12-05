@@ -11,6 +11,7 @@ use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 use DateTime;
 
 class PriceLevelExport implements FromArray, WithMapping, WithHeadings, WithColumnWidths, WithStyles, WithColumnFormatting
@@ -28,8 +29,10 @@ class PriceLevelExport implements FromArray, WithMapping, WithHeadings, WithColu
       $result[] = $city->name;
     }
 
-    $date = (new DateTime('+1 day'))->format('Y-m-d');
-    $start = ['Дата:', $date];
+    $dateTime = (new DateTime('+1 day'));
+    $date = Date::dateTimeToExcel($dateTime);
+    $formattedNumber = number_format($date, 0, '.', '');
+    $start = ['Дата:',  $formattedNumber];
     $heading_1 = array_merge($start, $result);
 
     return [

@@ -9,12 +9,7 @@ use Illuminate\Http\Request;
 use App\Exports\PriceLevelExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
-
-use Illuminate\Support\Facades\Storage;
-
 use App\Imports\PriceLevelImport;
-
-use App\Http\Middleware\ModifyRequest;
 
 class Controller_site_price_level extends Controller
 {
@@ -129,7 +124,7 @@ class Controller_site_price_level extends Controller
 
     public function save_edit(Request $request): GlobalResource
     {
-      Model_site_price_level::get_all_level_items($request->data['level_id']);
+      Model_site_price_level::delete_all_items_level($request->data['level_id']);
 
       foreach($request->data['items'] as $item){
 
@@ -175,42 +170,11 @@ class Controller_site_price_level extends Controller
       return Excel::download(new PriceLevelExport, 'form_price_level.xlsx');
     }
 
-    public function import_file_xls(Request $request)
+    public function import_file_xls(Request $request): GlobalResource
     {
-        //$contents = $request->all('file');
-
-        /*foreach($request->file('file') as $image) {
-            $filename = time().rand(3, 9). '.'.$image->getClientOriginalExtension();
-            $image->move('uploads/', $filename);
-        }*/
-
-        //return $request->all();
-        //return $request->file;
-
-      //$path = Storage::putFile('\storage\app', $request->file('file'));
-      //$path = Storage::disk('public')->putFile('avatars', $request->file('file'));
-
-        $path = Storage::disk('public')->put('avatars', $request->file );
-
-        return $path;
-
-      //return $request->all('file');
-
-//  Storage::put('form_price_level.xlsx', $contents['file']);
-
-//      $data = $request->file('document');
-//
-//      Storage::disk('local')->put('form_price_level.xlsx', $data);
-
-//      return new GlobalResource([
-//        'data' =>  $data
-//      ]);
-
-//        Excel::toArray(new PriceLevelImport, public_path('\storage\form_price_level.xlsx'));
-
-//       Excel::import(new PriceLevelImport, 'form_price_level.xlsx');
-
-//       return redirect('/')->with('success', 'All good!');
+      $import = new PriceLevelImport;
+      Excel::import($import, $request->file);
+      return $import->get_result_save_import_level();
     }
 
 }

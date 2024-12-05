@@ -191,4 +191,18 @@ class Model_site_price_level extends Model
       ') ?? [];
     }
 
+    static function get_city_by_name(string $name): object
+    {
+      return DB::selectOne(/** @lang text */ '
+        SELECT
+          `id`
+        FROM
+          jaco_main_rolls.`cities`
+        WHERE
+          `is_show`=1
+            AND
+          `name`=:name
+        ', ['name' => $name]);
+    }
+
 }
