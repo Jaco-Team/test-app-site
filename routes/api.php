@@ -14,6 +14,7 @@ use App\Http\Controllers\Controller_site_push;
 use App\Http\Controllers\Controller_stat_time_orders;
 use App\Http\Controllers\Controller_site_page_text;
 use App\Http\Controllers\Controller_site_price_level;
+use App\Http\Controllers\Controller_site_user_manager;
 
 Route::get('/', [IndexController::class, 'index'])->name('home');
 Route::get('/one', [IndexController::class, 'get_last'])->name('home');
@@ -77,6 +78,10 @@ Route::middleware([CheckToken::class])->group(function () {
       Route::any('/save_edit', [Controller_site_price_level::class, 'save_edit']);
       Route::any('/export_file_xls', [Controller_site_price_level::class, 'export_file_xls']);
       Route::any('/import_file_xls', [Controller_site_price_level::class, 'import_file_xls']);
+    });
+
+    Route::prefix('site_user_manager')->group(function () {
+      Route::any('/get_all', [Controller_site_user_manager::class, 'get_all']);
     });
 
 });

@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Imports;
+namespace App\Http\Controllers\Api;
 
 use App\Http\Resources\GlobalResource;
+use App\Models\Model_site_price_level;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
-use App\Models\Model_site_price_level;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 class PriceLevelImport implements ToCollection
@@ -19,12 +19,12 @@ class PriceLevelImport implements ToCollection
 
     $new_data = [];
 
-    foreach($rows as $key_row => $row) {
+    foreach ($rows as $key_row => $row) {
 
-      if($key_row === 0) {
+      if ($key_row === 0) {
 
-        foreach($row as $key_value => $value) {
-          if($key_value !== 0 && $key_value !== 1) {
+        foreach ($row as $key_value => $value) {
+          if ($key_value !== 0 && $key_value !== 1) {
             $city_id = Model_site_price_level::get_city_by_name($value);
             $new_data[] = array(
               'city_id' => $city_id->id,
@@ -59,26 +59,26 @@ class PriceLevelImport implements ToCollection
 
       }
 
-      if($key_row !== 0 && $key_row !== 1) {
+      if ($key_row !== 0 && $key_row !== 1) {
 
-        foreach($row as $key_value => $value) {
+        foreach ($row as $key_value => $value) {
 
-          if($key_value !== 0 && $key_value !== 1) {
+          if ($key_value !== 0 && $key_value !== 1) {
 
-            if(is_string($value)) {
+            if (is_string($value)) {
               $this->st = false;
               $this->text = 'Укажите цену в ' . $key_row + 1 . ' строке, в товаре ' . $row[1];
 
               return;
             }
 
-            if(is_null($value)) {
+            if (is_null($value)) {
               $row[$key_value] = 0;
             }
 
             $index = $key_value - 2;
 
-            if($new_data[$index]['key_value'] === $key_value) {
+            if ($new_data[$index]['key_value'] === $key_value) {
               $new_data[$index]['items'][] = array(
                 'id' => $row[0],
                 'price' => $row[$key_value]
@@ -95,9 +95,9 @@ class PriceLevelImport implements ToCollection
 
     }
 
-    if(count($new_data) > 0) {
+    if (count($new_data) > 0) {
 
-      foreach($new_data as $data) {
+      foreach ($new_data as $data) {
 
         $level_id = Model_site_price_level::insert_new_level(
           $data['name'],
@@ -108,9 +108,9 @@ class PriceLevelImport implements ToCollection
 
         if ($level_id > 0) {
 
-          foreach($data['items'] as $item){
+          foreach ($data['items'] as $item) {
 
-            if(empty($item['price'])){
+            if (empty($item['price'])) {
               $item['price'] = 0;
             }
 
@@ -140,4 +140,3 @@ class PriceLevelImport implements ToCollection
 
 
 }
-

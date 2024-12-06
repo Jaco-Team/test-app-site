@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Exports;
+namespace App\Http\Controllers\Api;
 
 use App\Models\Model_site_price_level;
 use Maatwebsite\Excel\Concerns\WithMapping;
@@ -81,4 +81,3 @@ class PriceLevelExport implements FromArray, WithMapping, WithHeadings, WithColu
   }
 
 }
-
