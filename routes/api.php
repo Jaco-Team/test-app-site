@@ -82,6 +82,11 @@ Route::middleware([CheckToken::class])->group(function () {
 
     Route::prefix('site_user_manager')->group(function () {
       Route::any('/get_all', [Controller_site_user_manager::class, 'get_all']);
+      Route::any('/getUsers', [Controller_site_user_manager::class, 'get_users']);
+      Route::any('/getAllForNew', [Controller_site_user_manager::class, 'get_all_for_new']);
+      Route::any('/getUser', [Controller_site_user_manager::class, 'get_one_user']);
+      Route::any('/saveNewUser', [Controller_site_user_manager::class, 'save_new_user']);
+      Route::any('/saveEditUser', [Controller_site_user_manager::class, 'save_edit_user']);
     });
 
 });
