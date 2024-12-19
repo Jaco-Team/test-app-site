@@ -10,6 +10,22 @@ class Model_site_clients extends Model
 {
     use HasFactory;
 
+    static function save_history(int $user_login, int $editor_id, string $date_time, string $event, mixed $value)
+    {
+      DB::insert(/** @lang text */ '
+        INSERT INTO jaco_site_rolls.`from_site_user_events` (user_login, editor_id, date_time, event, value)
+          VALUES (
+            "'.$user_login.'",
+            "'.$editor_id.'",
+            "'.$date_time.'",
+            "'.$event.'",
+            "'.$value.'"
+          )
+      ');
+
+      return DB::getPdo()->lastInsertId();
+    }
+
     static function get_site_clients(string $check_login): array
     {
       return DB::select(/** @lang text */ '

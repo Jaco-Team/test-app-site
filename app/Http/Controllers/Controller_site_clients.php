@@ -403,6 +403,11 @@ class Controller_site_clients extends Controller
       $request->data['mail'] = addslashes($request->data['mail']);
       $res = Model_site_clients::save_data_client($request->data['login'], $request->data['date_bir'], $request->data['mail']);
 
+      if( $res ) {
+        Model_site_clients::save_history($request->data['login'], $request->data['user_id'], date('Y-m-d H:i:s'), 'change_mail', $request->data['mail']);
+        Model_site_clients::save_history($request->data['login'], $request->data['user_id'], date('Y-m-d H:i:s'), 'change_date_bir', $request->data['date_bir']);
+      }
+
       return new GlobalResource([
         'st' => $res,
         'text' => $res ? 'Успешно сохранено' : 'Ошибка сохранения'
@@ -556,6 +561,8 @@ class Controller_site_clients extends Controller
       $res = Model_site_clients::insert_user_sms_code($request->data['user_id'], $sms_code, date('Y-m-d H:i:s'));
 
       if((int)$res > 0) {
+
+        Model_site_clients::save_history($request->data['number'], $request->data['user_id'], date('Y-m-d H:i:s'), 'send_sms', '');
 
         //отправить смс
         (new Controller_sms)->send_sms(
