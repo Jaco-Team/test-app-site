@@ -224,11 +224,15 @@ class Controller_site_clients extends Controller
         $client_orders = array_merge($client_orders, $client_order);
       }
 
+      $collection_orders_client = collect($client_orders);
+
+      $sorted_collection_orders_client = $collection_orders_client->sortByDesc('date_time');
+
       return new GlobalResource([
         'st' => true,
         'client_info' => $client_info,
         'all_points' => $all_points,
-        'client_orders' => $client_orders,
+        'client_orders' => $sorted_collection_orders_client->values()->all(),
         'err_orders' => $err_orders,
         'client_comments' => $client_comments,
         'client_login_sms' => $client_login_sms,

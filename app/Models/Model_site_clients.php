@@ -77,10 +77,18 @@ class Model_site_clients extends Model
 
     static function get_client_orders(string $base, int $id, string $number): array
     {
+      //CONCAT(DATE(IF(o.`unix_date_time_preorder`=0, o.`date_time_order`, o.`date_time_preorder`)), " ", `close_date_time_order` ) as date_time,
+
       return DB::select(/** @lang text */ '
         SELECT
           if(o.`type_order`=1, "Доставка", "Самовывоз") as new_type_order,
-          CONCAT(DATE(IF(o.`unix_date_time_preorder`=0, o.`date_time_order`, o.`date_time_preorder`)), " ", `close_date_time_order`) as date_time,
+
+          IF( o.`is_delete` = 0,
+            IF(o.`unix_date_time_preorder`=0, IF( o.`status_order`=6, CONCAT(DATE(IF(o.`unix_date_time_preorder`=0, o.`date_time_order`, o.`date_time_preorder`)), " ", `close_date_time_order` ), o.`date_time_order` ), o.`date_time_preorder`),
+            o.`date_time_delete`
+          ) as date_time,
+
+
           `summ_promo`+`summ_div` as summ,
           o.`id` as order_id,
           p.`id` as point_id,
@@ -327,6 +335,8 @@ class Model_site_clients extends Model
           (er.`phone_order` LIKE "'.$login.'"
             OR
           er.`phone_dop` LIKE "'.$login.'")
+        ORDER BY
+          er.`date_time_desc` DESC
       ') ?? [];
     }
 
@@ -343,7 +353,7 @@ class Model_site_clients extends Model
           uca.`description`,
           uca.`raiting`,
           uca.`sale`
-        FROM
+       FROM
           jaco_site_rolls.`user_comments` uc
           LEFT JOIN jaco_main_rolls.`users` u
             ON
@@ -354,8 +364,10 @@ class Model_site_clients extends Model
           LEFT JOIN jaco_main_rolls.`users` u1
             ON
               u1.`id`=uca.`user_id`
-        WHERE
+       WHERE
           `user_number` LIKE :login
+       ORDER BY
+          `date_add` DESC
       ', ['login' => $login]) ?? [];
     }
 
