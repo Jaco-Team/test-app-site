@@ -409,8 +409,8 @@ class Controller_site_clients extends Controller
       }
 
       return new GlobalResource([
-        'st' => $res,
-        'text' => $res ? 'Успешно сохранено' : 'Ошибка сохранения'
+        'st' => true,
+        'text' => 'Успешно сохранено'
       ]);
     }
 
