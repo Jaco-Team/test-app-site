@@ -404,8 +404,8 @@ class Controller_site_clients extends Controller
       $res = Model_site_clients::save_data_client($request->data['login'], $request->data['date_bir'], $request->data['mail']);
 
       if( $res ) {
-        Model_site_clients::save_history($request->data['login'], $request->data['user_id'], date('Y-m-d H:i:s'), 'change_mail', $request->data['mail']);
-        Model_site_clients::save_history($request->data['login'], $request->data['user_id'], date('Y-m-d H:i:s'), 'change_date_bir', $request->data['date_bir']);
+        Model_site_clients::save_history($request->data['login'], $request->login['id'], date('Y-m-d H:i:s'), 'change_mail', $request->data['mail']);
+        Model_site_clients::save_history($request->data['login'], $request->login['id'], date('Y-m-d H:i:s'), 'change_date_bir', $request->data['date_bir']);
       }
 
       return new GlobalResource([
@@ -562,7 +562,7 @@ class Controller_site_clients extends Controller
 
       if((int)$res > 0) {
 
-        Model_site_clients::save_history($request->data['number'], $request->data['user_id'], date('Y-m-d H:i:s'), 'send_sms', '');
+        Model_site_clients::save_history($request->data['number'], $request->login['id'], date('Y-m-d H:i:s'), 'send_sms', '');
 
         //отправить смс
         (new Controller_sms)->send_sms(
