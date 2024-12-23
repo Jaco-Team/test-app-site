@@ -33,7 +33,7 @@ class Controller_promo extends Controller
         }
     }
 
-    public function new_promo(array $name, int $count, int $promo_action, int $promo_type_sale, array $promo_items, array $promo_cat, string $count_promo, int $promo_type, array $promo_items_add, array $promo_items_sale, int $promo_conditions, array $promo_conditions_items, int $min_sum, int $max_sum, array $dates, int $type_order, array $city, array $text, array $limit, int $user_id)
+    public function new_promo(array $name, int $count, int $promo_action, int $promo_type_sale, string $promo_items, string $promo_cat, string $count_promo, int $promo_type, string $promo_items_add, string $promo_items_sale, int $promo_conditions, string $promo_conditions_items, int $min_sum, int $max_sum, array $dates, int $type_order, array $city, array $text, array $limit, int $user_id)
     {
 
         if( $name['type'] == 'generate' ){

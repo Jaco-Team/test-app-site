@@ -7,7 +7,9 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class GlobalResource extends JsonResource
 {
-    /**
+  public mixed $search_orders;
+
+  /**
      * Transform the resource into an array.
      *
      * @return array<string, mixed>
