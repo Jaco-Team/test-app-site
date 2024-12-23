@@ -15,6 +15,7 @@ use App\Http\Controllers\Controller_stat_time_orders;
 use App\Http\Controllers\Controller_site_page_text;
 use App\Http\Controllers\Controller_site_price_level;
 use App\Http\Controllers\Controller_site_user_manager;
+
 use App\Http\Controllers\Controller_vendor_mini;
 use App\Http\Controllers\Controller_site_clients;
 
@@ -90,6 +91,7 @@ Route::middleware([CheckToken::class])->group(function () {
       Route::any('/saveNewUser', [Controller_site_user_manager::class, 'save_new_user']);
       Route::any('/saveEditUser', [Controller_site_user_manager::class, 'save_edit_user']);
     });
+
 
     Route::prefix('vendor_mini')->group(function () {
       Route::any('/get_all', [Controller_vendor_mini::class, 'get_all']);
