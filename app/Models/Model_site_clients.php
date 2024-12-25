@@ -586,6 +586,8 @@ class Model_site_clients extends Model
 
             (SELECT su.`id` FROM jaco_main_rolls.`site_users` su WHERE su.`login`=o.`number` LIMIT 1) as user_id,
 
+            (SELECT u.`short_name` FROM jaco_main_rolls.`users` u WHERE u.`id`=o.`driver_id` LIMIT 1) as driver,
+
             TIME_FORMAT(o.`date_time_order`, "%H:%i:%S") as date_time_order,
             TIME_FORMAT(o.`date_time_preorder`, "%H:%i:%S") as date_time_preorder,
             TIME_FORMAT(o.`date_time_preorder`, "%H:%i:%S") as date_time_preorder_text,
