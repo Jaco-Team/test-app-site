@@ -99,6 +99,14 @@ class Controller_site_clients extends Controller
 
       $search_orders = [];
 
+      if( strlen($request->data['date_start']) == 0 ){
+        $request->data['date_start'] = '2000-01-01';
+      }
+
+      if( strlen($request->data['date_end']) == 0 ){
+        $request->data['date_end'] = date('Y-m-d', time() + 86400 * 7 * 3);
+      }
+
       if(count($points) > 0){
         foreach($points as $point){
           $orders = Model_site_clients::get_orders($point->id, $point->addr, $point->base, $request->data['date_start'], $request->data['date_end'], $search_data, $item_id);
