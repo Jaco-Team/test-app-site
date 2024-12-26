@@ -20,3 +20,4 @@ yarn-error.log
 /.vscode
 /.osp
 app/Http/Controllers/Api/Firebase.json
+package-lock.json

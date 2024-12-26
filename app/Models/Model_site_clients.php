@@ -10,6 +10,22 @@ class Model_site_clients extends Model
 {
     use HasFactory;
 
+    static function save_history(int $user_login, int $editor_id, string $date_time, string $event, mixed $value)
+    {
+      DB::insert(/** @lang text */ '
+        INSERT INTO jaco_site_rolls.`from_site_user_events` (user_login, editor_id, date_time, event, value)
+          VALUES (
+            "'.$user_login.'",
+            "'.$editor_id.'",
+            "'.$date_time.'",
+            "'.$event.'",
+            "'.$value.'"
+          )
+      ');
+
+      return DB::getPdo()->lastInsertId();
+    }
+
     static function get_site_clients(string $check_login): array
     {
       return DB::select(/** @lang text */ '
@@ -77,10 +93,18 @@ class Model_site_clients extends Model
 
     static function get_client_orders(string $base, int $id, string $number): array
     {
+      //CONCAT(DATE(IF(o.`unix_date_time_preorder`=0, o.`date_time_order`, o.`date_time_preorder`)), " ", `close_date_time_order` ) as date_time,
+
       return DB::select(/** @lang text */ '
         SELECT
           if(o.`type_order`=1, "Доставка", "Самовывоз") as new_type_order,
-          CONCAT(DATE(IF(o.`unix_date_time_preorder`=0, o.`date_time_order`, o.`date_time_preorder`)), " ", `close_date_time_order`) as date_time,
+
+          IF( o.`is_delete` = 0,
+            IF(o.`unix_date_time_preorder`=0, IF( o.`status_order`=6, CONCAT(DATE(IF(o.`unix_date_time_preorder`=0, o.`date_time_order`, o.`date_time_preorder`)), " ", `close_date_time_order` ), o.`date_time_order` ), o.`date_time_preorder`),
+            o.`date_time_delete`
+          ) as date_time,
+
+
           `summ_promo`+`summ_div` as summ,
           o.`id` as order_id,
           p.`id` as point_id,
@@ -327,6 +351,8 @@ class Model_site_clients extends Model
           (er.`phone_order` LIKE "'.$login.'"
             OR
           er.`phone_dop` LIKE "'.$login.'")
+        ORDER BY
+          er.`date_time_desc` DESC
       ') ?? [];
     }
 
@@ -343,7 +369,7 @@ class Model_site_clients extends Model
           uca.`description`,
           uca.`raiting`,
           uca.`sale`
-        FROM
+       FROM
           jaco_site_rolls.`user_comments` uc
           LEFT JOIN jaco_main_rolls.`users` u
             ON
@@ -354,8 +380,10 @@ class Model_site_clients extends Model
           LEFT JOIN jaco_main_rolls.`users` u1
             ON
               u1.`id`=uca.`user_id`
-        WHERE
+       WHERE
           `user_number` LIKE :login
+       ORDER BY
+          `date_add` DESC
       ', ['login' => $login]) ?? [];
     }
 
@@ -557,6 +585,8 @@ class Model_site_clients extends Model
             o.`client_id`,
 
             (SELECT su.`id` FROM jaco_main_rolls.`site_users` su WHERE su.`login`=o.`number` LIMIT 1) as user_id,
+
+            (SELECT u.`short_name` FROM jaco_main_rolls.`users` u WHERE u.`id`=o.`driver_id` LIMIT 1) as driver,
 
             TIME_FORMAT(o.`date_time_order`, "%H:%i:%S") as date_time_order,
             TIME_FORMAT(o.`date_time_preorder`, "%H:%i:%S") as date_time_preorder,

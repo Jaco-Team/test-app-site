@@ -99,6 +99,14 @@ class Controller_site_clients extends Controller
 
       $search_orders = [];
 
+      if( strlen($request->data['date_start']) == 0 ){
+        $request->data['date_start'] = '2000-01-01';
+      }
+
+      if( strlen($request->data['date_end']) == 0 ){
+        $request->data['date_end'] = date('Y-m-d', time() + 86400 * 7 * 3);
+      }
+
       if(count($points) > 0){
         foreach($points as $point){
           $orders = Model_site_clients::get_orders($point->id, $point->addr, $point->base, $request->data['date_start'], $request->data['date_end'], $search_data, $item_id);
@@ -224,11 +232,15 @@ class Controller_site_clients extends Controller
         $client_orders = array_merge($client_orders, $client_order);
       }
 
+      $collection_orders_client = collect($client_orders);
+
+      $sorted_collection_orders_client = $collection_orders_client->sortByDesc('date_time');
+
       return new GlobalResource([
         'st' => true,
         'client_info' => $client_info,
         'all_points' => $all_points,
-        'client_orders' => $client_orders,
+        'client_orders' => $sorted_collection_orders_client->values()->all(),
         'err_orders' => $err_orders,
         'client_comments' => $client_comments,
         'client_login_sms' => $client_login_sms,
@@ -399,9 +411,14 @@ class Controller_site_clients extends Controller
       $request->data['mail'] = addslashes($request->data['mail']);
       $res = Model_site_clients::save_data_client($request->data['login'], $request->data['date_bir'], $request->data['mail']);
 
+      if( $res ) {
+        Model_site_clients::save_history($request->data['login'], $request->login['id'], date('Y-m-d H:i:s'), 'change_mail', $request->data['mail']);
+        Model_site_clients::save_history($request->data['login'], $request->login['id'], date('Y-m-d H:i:s'), 'change_date_bir', $request->data['date_bir']);
+      }
+
       return new GlobalResource([
-        'st' => $res,
-        'text' => $res ? 'Успешно сохранено' : 'Ошибка сохранения'
+        'st' => true,
+        'text' => 'Успешно сохранено'
       ]);
     }
 
@@ -552,6 +569,8 @@ class Controller_site_clients extends Controller
       $res = Model_site_clients::insert_user_sms_code($request->data['user_id'], $sms_code, date('Y-m-d H:i:s'));
 
       if((int)$res > 0) {
+
+        Model_site_clients::save_history($request->data['number'], $request->login['id'], date('Y-m-d H:i:s'), 'send_sms', '');
 
         //отправить смс
         (new Controller_sms)->send_sms(
