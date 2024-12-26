@@ -62,6 +62,11 @@ class Controller_site_clients extends Controller
       $city_id = '';
       $search_data = '';
       $item_id = '';
+      $promo = '';
+
+      if( strlen($request->data['promo']) > 0 ) {
+        $promo = Model_site_clients::get_promo_by_name($request->data['promo']);
+      }
 
       if(count($request->data['city_id']) > 0){
         foreach($request->data['city_id'] as $city){
@@ -109,7 +114,7 @@ class Controller_site_clients extends Controller
 
       if(count($points) > 0){
         foreach($points as $point){
-          $orders = Model_site_clients::get_orders($point->id, $point->addr, $point->base, $request->data['date_start'], $request->data['date_end'], $search_data, $item_id);
+          $orders = Model_site_clients::get_orders($point->id, $point->addr, $point->base, $request->data['date_start'], $request->data['date_end'], $search_data, $item_id, $promo);
 
           $search_orders = array_merge($search_orders, $orders);
         }

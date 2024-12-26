@@ -13,7 +13,7 @@ use App\Http\Controllers\Controller_app_work;
 use App\Http\Controllers\Controller_site_push;
 use App\Http\Controllers\Controller_stat_time_orders;
 use App\Http\Controllers\Controller_site_page_text;
-use App\Http\Controllers\Controller_site_price_level;
+use App\Http\Controllers\Controller_site_price_lavel;
 use App\Http\Controllers\Controller_site_user_manager;
 
 use App\Http\Controllers\Controller_vendor_mini;
@@ -73,15 +73,15 @@ Route::middleware([CheckToken::class])->group(function () {
       Route::any('/save_edit', [Controller_site_page_text::class, 'save_edit']);
     });
 
-    Route::prefix('site_price_level')->group(function () {
-      Route::any('/get_all', [Controller_site_price_level::class, 'get_all']);
-      Route::any('/get_all_for_new', [Controller_site_price_level::class, 'get_all_for_new']);
-      Route::any('/save_new', [Controller_site_price_level::class, 'save_new']);
-      Route::any('/get_one', [Controller_site_price_level::class, 'get_one']);
-      Route::any('/save_one_price', [Controller_site_price_level::class, 'save_one_price']);
-      Route::any('/save_edit', [Controller_site_price_level::class, 'save_edit']);
-      Route::any('/export_file_xls', [Controller_site_price_level::class, 'export_file_xls']);
-      Route::any('/import_file_xls', [Controller_site_price_level::class, 'import_file_xls']);
+    Route::prefix('site_price_lavel')->group(function () {
+      Route::any('/get_all', [Controller_site_price_lavel::class, 'get_all']);
+      Route::any('/get_all_for_new', [Controller_site_price_lavel::class, 'get_all_for_new']);
+      Route::any('/save_new', [Controller_site_price_lavel::class, 'save_new']);
+      Route::any('/get_one', [Controller_site_price_lavel::class, 'get_one']);
+      Route::any('/save_one_price', [Controller_site_price_lavel::class, 'save_one_price']);
+      Route::any('/save_edit', [Controller_site_price_lavel::class, 'save_edit']);
+      Route::any('/export_file_xls', [Controller_site_price_lavel::class, 'export_file_xls']);
+      Route::any('/import_file_xls', [Controller_site_price_lavel::class, 'import_file_xls']);
     });
 
     Route::prefix('site_user_manager')->group(function () {
@@ -92,7 +92,6 @@ Route::middleware([CheckToken::class])->group(function () {
       Route::any('/saveNewUser', [Controller_site_user_manager::class, 'save_new_user']);
       Route::any('/saveEditUser', [Controller_site_user_manager::class, 'save_edit_user']);
     });
-
 
     Route::prefix('vendor_mini')->group(function () {
       Route::any('/get_all', [Controller_vendor_mini::class, 'get_all']);

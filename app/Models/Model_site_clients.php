@@ -431,6 +431,18 @@ class Model_site_clients extends Model
       ', ['promo_id' => $promo_id]) ?? [];
     }
 
+    static function get_promo_by_name(string $promo): string
+    {
+      return DB::selectOne(/** @lang text */ '
+          SELECT
+            GROUP_CONCAT(DISTINCT `id`) as ids
+          FROM
+            jaco_site_rolls.`promo`
+          WHERE
+            `name`=:promo
+        ', ['promo' => $promo])->ids ?? '';
+    }
+
     static function get_client(string $login): object|null
     {
       return DB::selectOne(/** @lang text */ '
@@ -574,7 +586,7 @@ class Model_site_clients extends Model
         ') ?? [];
     }
 
-    static function get_orders(int $point_id, string $addr, string $base, string $date_start, string $date_end, string $search_data, string $item_id): array
+    static function get_orders(int $point_id, string $addr, string $base, string $date_start, string $date_end, string $search_data, string $item_id, string $promo): array
     {
       return DB::select( '
         SELECT
@@ -645,8 +657,12 @@ class Model_site_clients extends Model
             '.$search_data.'
                 AND
             o.`id` IN (SELECT oi.`order_id` FROM '.$base.'.`order_items` oi '.$item_id.')
+                AND
+            (o.`promo_id` IN ('.$promo.')
+                OR
+            '.$promo.'="")
         ORDER BY
-                unix_time DESC
+            unix_time DESC
       ') ?? [];
     }
 

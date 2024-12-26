@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\Model_site_price_level;
+use App\Models\Model_site_price_lavel;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -19,11 +19,11 @@ class PriceLevelExport implements FromArray, WithMapping, WithHeadings, WithColu
 {
   public function array(): array
   {
-    return Model_site_price_level::get_all_items();
+    return Model_site_price_lavel::get_all_items();
   }
 
   public function headings (): array {
-    $cities = Model_site_price_level::get_cities();
+    $cities = Model_site_price_lavel::get_cities();
     $result = array();
 
     foreach($cities as $city){
