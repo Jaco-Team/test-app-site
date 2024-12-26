@@ -38,6 +38,16 @@ class Controller_site_price_level extends Controller
 
     public function save_new(Request $request): GlobalResource
     {
+
+      $res = Model_site_price_level::get_one_data_level($request->data['city_id'], $request->data['date_start']);
+
+      if($res) {
+        return new GlobalResource([
+          'st' => false,
+          'text' => 'Данные по указанному городу или дате уже существуют'
+        ]);
+      }
+
       $request->data['name'] = addslashes($request->data['name']);
 
       $level_id = Model_site_price_level::insert_new_level(

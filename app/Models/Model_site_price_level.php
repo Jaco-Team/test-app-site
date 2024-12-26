@@ -211,4 +211,18 @@ class Model_site_price_level extends Model
         ', ['name' => $name]);
     }
 
+    static function get_one_data_level(int $city_id, string $date_start): object|null
+    {
+      return DB::selectOne(/** @lang text */'
+        SELECT
+          `name`
+        FROM
+          jaco_site_rolls.`price_level_new`
+        WHERE
+          `city_id`=:city_id
+            AND
+          `date_start`=:date_start
+      ', ['city_id' => $city_id, 'date_start' => $date_start]);
+    }
+
 }

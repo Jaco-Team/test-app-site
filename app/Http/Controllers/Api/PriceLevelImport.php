@@ -104,6 +104,15 @@ class PriceLevelImport implements ToCollection
 
       foreach ($new_data as $data) {
 
+        $res = Model_site_price_level::get_one_data_level($data['city_id'], $data['date_start']);
+
+        if($res) {
+          $this->st = false;
+          $this->text = 'Данные по указанному городу или дате уже существуют';
+
+          return;
+        }
+
         $level_id = Model_site_price_level::insert_new_level(
           $data['name'],
           $data['city_id'],
