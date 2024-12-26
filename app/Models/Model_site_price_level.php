@@ -151,7 +151,7 @@ class Model_site_price_level extends Model
       ', ['level_id' => $level_id]);
     }
 
-    static function insert_all_level_items(int $item_id, int $level_id, int $price): void
+    static function insert_all_level_items(int $item_id, int $level_id, int|string $price): void
     {
       DB::insert(/** @lang text */ '
         INSERT INTO jaco_site_rolls.`price_level_items_new` (item_id, level_id, price)

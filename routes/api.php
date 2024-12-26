@@ -16,6 +16,7 @@ use App\Http\Controllers\Controller_site_page_text;
 use App\Http\Controllers\Controller_site_price_level;
 use App\Http\Controllers\Controller_site_user_manager;
 use App\Http\Controllers\Controller_site_clients;
+use App\Http\Controllers\Controller_cafe_edit;
 
 Route::get('/', [IndexController::class, 'index'])->name('home');
 Route::get('/one', [IndexController::class, 'get_last'])->name('home');
@@ -102,6 +103,15 @@ Route::middleware([CheckToken::class])->group(function () {
       Route::any('/save_promo', [Controller_site_clients::class, 'save_promo']);
       Route::any('/get_code', [Controller_site_clients::class, 'get_code']);
       Route::any('/export_file_xls', [Controller_site_clients::class, 'export_file_xls']);
+    });
+
+    Route::prefix('cafe_edit')->group(function () {
+      Route::any('/get_all', [Controller_cafe_edit::class, 'get_all']);
+      Route::any('/get_one', [Controller_cafe_edit::class, 'get_one']);
+      Route::any('/save_edit_point_info', [Controller_cafe_edit::class, 'save_edit_point_info']);
+      Route::any('/save_edit_point_sett', [Controller_cafe_edit::class, 'save_edit_point_sett']);
+      Route::any('/save_edit_point_rate', [Controller_cafe_edit::class, 'save_edit_point_rate']);
+      Route::any('/save_edit_point_pay', [Controller_cafe_edit::class, 'save_edit_point_pay']);
     });
 
 });

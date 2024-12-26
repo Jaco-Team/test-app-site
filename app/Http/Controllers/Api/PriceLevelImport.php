@@ -65,11 +65,16 @@ class PriceLevelImport implements ToCollection
 
           if ($key_value !== 0 && $key_value !== 1) {
 
-            if (is_string($value)) {
-              $this->st = false;
-              $this->text = 'Укажите цену в ' . $key_row + 1 . ' строке, в товаре ' . $row[1];
+            if(is_string($value)){
+              $new_value = preg_replace('/[^0-9]+/', '', $value);
 
-              return;
+              if (!ctype_digit($new_value)) {
+                $this->st = false;
+                $this->text = 'Укажите цену в ' . $key_row + 1 . ' строке, в товаре ' . $row[1];
+
+                return;
+              }
+
             }
 
             if (is_null($value)) {

@@ -14,6 +14,7 @@ use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use DateTime;
 
+
 class PriceLevelExport implements FromArray, WithMapping, WithHeadings, WithColumnWidths, WithStyles, WithColumnFormatting
 {
   public function array(): array
