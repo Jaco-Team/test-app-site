@@ -66,6 +66,8 @@ class Controller_site_clients extends Controller
 
       if( strlen($request->data['promo']) > 0 ) {
         $promo = Model_site_clients::get_promo_by_name($request->data['promo']);
+      }else{
+        $promo = '""';
       }
 
       if(count($request->data['city_id']) > 0){
