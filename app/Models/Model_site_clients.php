@@ -660,7 +660,7 @@ class Model_site_clients extends Model
                 AND
             (o.`promo_id` IN ('.$promo.')
                 OR
-            '.$promo.'="")
+            "'.$promo.'"="")
         ORDER BY
             unix_time DESC
       ') ?? [];
