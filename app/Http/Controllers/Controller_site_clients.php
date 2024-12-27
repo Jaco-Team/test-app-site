@@ -11,6 +11,9 @@ use App\Http\Controllers\Api\SiteClientsExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
+set_time_limit(300);
+ini_set("memory_limit", "256M");
+
 class Controller_site_clients extends Controller
 {
     public function get_all(Request $request): GlobalResource
@@ -62,12 +65,19 @@ class Controller_site_clients extends Controller
       $city_id = '';
       $search_data = '';
       $item_id = '';
-      $promo = '';
+
 
       if( strlen($request->data['promo']) > 0 ) {
         $promo = Model_site_clients::get_promo_by_name($request->data['promo']);
-      }else{
-        $promo = '""';
+
+        if( strlen($promo) == 0 ){
+          return new GlobalResource([
+            'search_orders' => [],
+            '$promo' => $promo
+          ]);
+        }
+
+        $search_data = $search_data . ' AND o.`promo_id` IN ('.$promo.') ';
       }
 
       if(count($request->data['city_id']) > 0){
@@ -114,11 +124,19 @@ class Controller_site_clients extends Controller
         $request->data['date_end'] = date('Y-m-d', time() + 86400 * 7 * 3);
       }
 
+      $orders_test = '';
+
       if(count($points) > 0){
         foreach($points as $point){
-          $orders = Model_site_clients::get_orders($point->id, $point->addr, $point->base, $request->data['date_start'], $request->data['date_end'], $search_data, $item_id, $promo);
+          try {
+            $orders = Model_site_clients::get_orders($point->id, $point->addr, $point->base, $request->data['date_start'], $request->data['date_end'], $search_data, $item_id);
+            //$orders_test .= Model_site_clients::get_orders_test($point->id, $point->addr, $point->base, $request->data['date_start'], $request->data['date_end'], $search_data, $item_id);
 
-          $search_orders = array_merge($search_orders, $orders);
+            $search_orders = array_merge($search_orders, $orders);
+          }catch (\Exception $e){
+            dd($e->getMessage());
+          }
+
         }
       }
 
@@ -218,7 +236,8 @@ class Controller_site_clients extends Controller
       ]);
 
       return new GlobalResource([
-        'search_orders' => $orders
+        'search_orders' => $orders,
+        '$orders_test' => $orders_test
       ]);
     }
 
