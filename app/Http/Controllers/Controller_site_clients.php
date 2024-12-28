@@ -639,5 +639,4 @@ class Controller_site_clients extends Controller
     {
       return Excel::download(new SiteClientsExport($request), 'table_orders.xlsx');
     }
-
 }
