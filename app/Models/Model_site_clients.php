@@ -431,6 +431,18 @@ class Model_site_clients extends Model
       ', ['promo_id' => $promo_id]) ?? [];
     }
 
+    static function get_promo_by_name(string $promo): string
+    {
+      return DB::selectOne(/** @lang text */ '
+          SELECT
+            GROUP_CONCAT(DISTINCT `id`) as ids
+          FROM
+            jaco_site_rolls.`promo`
+          WHERE
+            `name`=:promo
+        ', ['promo' => $promo])->ids ?? '';
+    }
+
     static function get_client(string $login): object|null
     {
       return DB::selectOne(/** @lang text */ '
@@ -646,8 +658,84 @@ class Model_site_clients extends Model
                 AND
             o.`id` IN (SELECT oi.`order_id` FROM '.$base.'.`order_items` oi '.$item_id.')
         ORDER BY
-                unix_time DESC
+            unix_time DESC
       ') ?? [];
     }
+
+    static function get_orders_test(int $point_id, string $addr, string $base, string $date_start, string $date_end, string $search_data, string $item_id): string
+    {
+    return ( '
+        SELECT
+            "'.$point_id.'" as point_id,
+            "'.$addr.'" as point_addr,
+            o.`id`,
+
+            o.`client_id`,
+
+            (SELECT su.`id` FROM jaco_main_rolls.`site_users` su WHERE su.`login`=o.`number` LIMIT 1) as user_id,
+
+            (SELECT u.`short_name` FROM jaco_main_rolls.`users` u WHERE u.`id`=o.`driver_id` LIMIT 1) as driver,
+
+            TIME_FORMAT(o.`date_time_order`, "%H:%i:%S") as date_time_order,
+            TIME_FORMAT(o.`date_time_preorder`, "%H:%i:%S") as date_time_preorder,
+            TIME_FORMAT(o.`date_time_preorder`, "%H:%i:%S") as date_time_preorder_text,
+            TIME_FORMAT(o.`give_data_time`, "%H:%i:%S") as give_data_time,
+            TIME_FORMAT(o.`date_time_delete`, "%H:%i:%S") as date_time_delete,
+            IF(o.`close_date_time_order` IS NOT NULL, o.`close_date_time_order`, "") as close_order,
+
+            UNIX_TIMESTAMP(if( o.`unix_date_time_preorder`=0, o.`date_time_order`, o.`date_time_preorder` )) as unix_time,
+
+            IF(o.`unix_date_time_preorder`=0, 0, 1) as is_preorder,
+
+            o.`street`,
+            o.`home`,
+
+            IF(o.`type_order`=1,
+                IF(o.`free_drive`=1, IF(o.`summ_promo`!=0, o.`summ_promo`, o.`summ_promo`+1), o.`summ_promo`+o.`summ_div`),
+                o.`summ_promo`) as order_price,
+            o.`is_delete`,
+
+            IF(o.`type_order`=1, "Доставка",
+                IF(o.`type_order`=2, "Самовывоз",
+                    IF(o.`type_order`=3, "Зал",
+                        IF(o.`type_order`=4, "Зал с собой", "Ошибка")))) as type_order,
+
+            o.`type_order` as type_origin,
+
+            IF(o.`type_pay`=1, "Нал", "Безнал") as type_pay,
+
+            IF(o.`status_order`=1, "В очереди",
+                IF(o.`status_order`=2, "Готовится",
+                    IF(o.`status_order`=3, "Готов на кухне",
+                    IF(o.`status_order`=4, "Собран",
+                        IF(o.`status_order`=5, "В пути",
+                            IF(o.`status_order`=6, "У клиента", "Ошибочка")))))) as status,
+            o.`status_order`,
+            IF(o.`number`=0, "", o.`number`) as number,
+
+            o.`unix_time_to_client`,
+            o.`unix_start_stol`,
+            o.`close_unix_date_time_order`,
+            o.`date_time_order` as date_time_origin,
+            o.`close_date_time_order`,
+            o.`give_data_time` as give_data_time_origin,
+
+            if(o.`unix_start_stol` != 0, SUBSTRING_INDEX(FROM_UNIXTIME(o.`unix_start_stol`), " ", -1), "") as time_start_stol,
+            ( SELECT IF( odi.`id` IS NULL, 5, odi.`plus_time_pred` ) FROM '.$base.'.`orders_dop_info` odi WHERE o.`id`=odi.`order_id` LIMIT 1 ) as plus_time
+        FROM
+            '.$base.'.`orders` o
+        WHERE
+            ((o.`date_time_order` BETWEEN "'.$date_start.' 00:00:00" AND "'.$date_end.' 23:59:59" AND o.`unix_date_time_preorder`=0)
+                OR
+            o.`date_time_preorder` BETWEEN "'.$date_start.' 00:00:00" AND "'.$date_end.' 23:59:59")
+                AND
+            o.`status_order`!=0
+            '.$search_data.'
+                AND
+            o.`id` IN (SELECT oi.`order_id` FROM '.$base.'.`order_items` oi '.$item_id.')
+        ORDER BY
+            unix_time DESC
+      ');
+  }
 
 }

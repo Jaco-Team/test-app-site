@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Resources\GlobalResource;
-use App\Models\Model_site_price_level;
+use App\Models\Model_site_price_lavel;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
@@ -25,7 +25,7 @@ class PriceLevelImport implements ToCollection
 
         foreach ($row as $key_value => $value) {
           if ($key_value !== 0 && $key_value !== 1) {
-            $city_id = Model_site_price_level::get_city_by_name($value);
+            $city_id = Model_site_price_lavel::get_city_by_name($value);
             $new_data[] = array(
               'city_id' => $city_id->id,
               'city_name' => $value,
@@ -68,9 +68,11 @@ class PriceLevelImport implements ToCollection
             if(is_string($value)){
               $new_value = preg_replace('/[^0-9]+/', '', $value);
 
-              if (!ctype_digit($new_value)) {
+              $row[$key_value] = $new_value;
+
+              if (!is_numeric($new_value)) {
                 $this->st = false;
-                $this->text = 'Укажите цену в ' . $key_row + 1 . ' строке, в товаре ' . $row[1];
+                $this->text = 'Укажите цену в ' . $key_row + 1 . ' строке, в товаре ' . $row[1] . ' -> ' . $value . ' -> ' . $new_value . ' -> ' . preg_replace('/[^0-9]+/', '', $value);
 
                 return;
               }
@@ -104,7 +106,7 @@ class PriceLevelImport implements ToCollection
 
       foreach ($new_data as $data) {
 
-        $res = Model_site_price_level::get_one_data_level($data['city_id'], $data['date_start']);
+        $res = Model_site_price_lavel::get_one_data_level($data['city_id'], $data['date_start']);
 
         if($res) {
           $this->st = false;
@@ -113,7 +115,7 @@ class PriceLevelImport implements ToCollection
           return;
         }
 
-        $level_id = Model_site_price_level::insert_new_level(
+        $level_id = Model_site_price_lavel::insert_new_level(
           $data['name'],
           $data['city_id'],
           $data['date_start'],
@@ -128,7 +130,7 @@ class PriceLevelImport implements ToCollection
               $item['price'] = 0;
             }
 
-            Model_site_price_level::insert_all_level_items($item['id'], $level_id, $item['price']);
+            Model_site_price_lavel::insert_all_level_items($item['id'], $level_id, $item['price']);
 
           }
 

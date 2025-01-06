@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-class Model_site_price_level extends Model
+class Model_site_price_lavel extends Model
 {
     use HasFactory;
 
@@ -30,10 +30,10 @@ class Model_site_price_level extends Model
           pln.*,
           c.`name` as city_name
         FROM
-          jaco_site_rolls.`price_level_new` pln
-           LEFT JOIN jaco_main_rolls.`cities` c
+          jaco_site_rolls.`price_lavel` pln
+          LEFT JOIN jaco_main_rolls.`cities` c
             ON
-          c.`id`=pln.`city_id`
+              c.`id`=pln.`city_id`
       ') ?? [];
     }
 
@@ -53,7 +53,7 @@ class Model_site_price_level extends Model
     static function insert_new_level(string $name, int $city_id, string $date_start, string $date_update): int
     {
       DB::insert(/** @lang text */ '
-          INSERT INTO jaco_site_rolls.`price_level_new` (name, city_id, date_start, date_time_update)
+          INSERT INTO jaco_site_rolls.`price_lavel` (name, city_id, date_start, date_time_update)
           VALUES(
             "'.$name.'",
             "'.$city_id.'",
@@ -68,10 +68,10 @@ class Model_site_price_level extends Model
     static function insert_new_level_items(int $level_id): int
     {
       DB::insert(/** @lang text */ '
-        INSERT INTO jaco_site_rolls.`price_level_items_new` (item_id, level_id, price)
+        INSERT INTO jaco_site_rolls.`price_lavel_items` (item_id, lavel_id, price)
           SELECT
             `id`,
-            "'.$level_id.'" as level_id,
+            "'.$level_id.'" as lavel_id,
             "0" as price
           FROM
             jaco_site_rolls.`items`
@@ -89,12 +89,12 @@ class Model_site_price_level extends Model
 					pli.*,
 					i.`name`
 				FROM
-					jaco_site_rolls.`price_level_items_new` pli
+					jaco_site_rolls.`price_lavel_items` pli
 					LEFT JOIN jaco_site_rolls.`items` i
 						ON
-            i.`id`=pli.`item_id`
+              i.`id`=pli.`item_id`
 				WHERE
-					pli.`level_id`="'.$level_id.'"
+					pli.`lavel_id`="'.$level_id.'"
       ') ?? [];
     }
 
@@ -121,7 +121,7 @@ class Model_site_price_level extends Model
         SELECT
           *
         FROM
-          jaco_site_rolls.`price_level_new`
+          jaco_site_rolls.`price_lavel`
         WHERE
           `id`="'.$level_id.'"
       ');
@@ -131,11 +131,11 @@ class Model_site_price_level extends Model
     {
       return DB::update(/** @lang text */'
         UPDATE
-          jaco_site_rolls.`price_level_items_new`
+          jaco_site_rolls.`price_lavel_items`
         SET
           `price`='.$value.'
         WHERE
-          `level_id`='.$level_id.'
+          `lavel_id`='.$level_id.'
             AND
           `item_id`='.$item_id.'
       ');
@@ -145,16 +145,16 @@ class Model_site_price_level extends Model
     {
       DB::select(/** @lang text */ '
         DELETE FROM
-          jaco_site_rolls.`price_level_items_new`
+          jaco_site_rolls.`price_lavel_items`
         WHERE
-          `level_id`=:level_id
+          `lavel_id`=:level_id
       ', ['level_id' => $level_id]);
     }
 
     static function insert_all_level_items(int $item_id, int $level_id, int|string $price): void
     {
       DB::insert(/** @lang text */ '
-        INSERT INTO jaco_site_rolls.`price_level_items_new` (item_id, level_id, price)
+        INSERT INTO jaco_site_rolls.`price_lavel_items` (item_id, lavel_id, price)
         VALUES(
           :item_id,
           :level_id,
@@ -167,7 +167,7 @@ class Model_site_price_level extends Model
     {
       return DB::update(/** @lang text */'
         UPDATE
-          jaco_site_rolls.`price_level_new`
+          jaco_site_rolls.`price_lavel`
         SET
           `name`="'.$name.'",
           `city_id`="'.$city_id.'",
@@ -217,7 +217,7 @@ class Model_site_price_level extends Model
         SELECT
           `name`
         FROM
-          jaco_site_rolls.`price_level_new`
+          jaco_site_rolls.`price_lavel`
         WHERE
           `city_id`=:city_id
             AND
