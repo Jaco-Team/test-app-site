@@ -237,7 +237,7 @@ class Controller_site_clients extends Controller
 
       return new GlobalResource([
         'search_orders' => $orders,
-        '$orders_test' => $orders_test
+        //'$orders_test' => $orders_test
       ]);
     }
 
