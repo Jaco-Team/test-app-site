@@ -103,7 +103,7 @@ class Model_cafe_edit extends Model
       return DB::select(/** @lang text */ '
         SELECT
 					pz.`id`,
-					pz.`name` as zone_name,
+					CONCAT(pz.name, " ( зона ", pz.id, " ) ") as zone_name,
 					pz.`point_id`,
 					pz.`sum_div`,
 					pz.`sum_div_driver`,
@@ -217,18 +217,49 @@ class Model_cafe_edit extends Model
       ');
     }
 
-    static function insert_event_new_hist(int $user_id, int $point_id, string $this_date, string $comment): void
+    static function insert_event_new_hist(int $user_id, string $type_active, string $type, int $point_id, int $zone_id, string $this_date, string $every, string $comment): void
     {
       DB::insert(/** @lang text */ '
         INSERT INTO
-          jaco_site_rolls.`event_new_hist` (user_id, type_active, type, point_id, date, every, comment)
+          jaco_site_rolls.`event_new_hist` (user_id, type_active, type, point_id, zone_id, date, every, comment)
         VALUES (
           "'.$user_id.'",
-          "2",
-          "4",
+          "'.$type_active.'",
+          "'.$type.'",
+          "'.$point_id.'",
+          "'.$zone_id.'",
+          "'.$this_date.'",
+          "'.$every.'",
+          "'.$comment.'"
+        )
+      ');
+    }
+
+    static function insert_event_new(string $type, int $point_id, int $zone_id, string $this_date, string $every, string $comment): void
+    {
+      DB::insert(/** @lang text */ '
+        INSERT INTO
+          jaco_site_rolls.`events_new` (type, point_id, zone_id, date, every, comment)
+        VALUES (
+          "'.$type.'",
+          "'.$point_id.'",
+          "'.$zone_id.'",
+          "'.$this_date.'",
+          "'.$every.'",
+          "'.$comment.'"
+        )
+      ');
+    }
+
+    static function insert_cafe_close_history(int $user_id_close, int $point_id, string $this_date, string $comment): void
+    {
+      DB::insert(/** @lang text */ '
+        INSERT INTO
+          jaco_site_rolls.`cafe_close_history` (user_id_close, point_id, date_time_close, comment)
+        VALUES (
+          "'.$user_id_close.'",
           "'.$point_id.'",
           "'.$this_date.'",
-          "0",
           "'.$comment.'"
         )
       ');
@@ -410,6 +441,216 @@ class Model_cafe_edit extends Model
             "'.$date_time_update.'"
           )
         ');
+    }
+
+    static function get_point_info_hist(int $point_id): array
+    {
+      return DB::select(/** @lang text */ '
+        SELECT
+          pih.*,
+          (SELECT `name` FROM jaco_main_rolls.`users` u WHERE u.`id` = pih.`creator_id` ) as user_name
+        FROM
+          jaco_main_rolls.`points_info_hist` pih
+        WHERE
+          pih.`point_id` = :point_id
+        ORDER BY
+	        pih.`date_time_update` ASC
+      ', ['point_id' => $point_id]) ?? [];
+    }
+
+    static function get_point_rate_hist(int $point_id): array
+    {
+      return DB::select(/** @lang text */ '
+        SELECT
+          pih.*,
+          (SELECT `name` FROM jaco_main_rolls.`users` u WHERE u.`id` = pih.`creator_id` ) as user_name
+        FROM
+          jaco_main_rolls.`points_rate_hist` pih
+        WHERE
+          pih.`point_id` = :point_id
+        ORDER BY
+          pih.`date_time_update` ASC
+      ', ['point_id' => $point_id]) ?? [];
+    }
+
+    static function get_point_pay_hist(int $point_id): array
+    {
+      return DB::select(/** @lang text */ '
+        SELECT
+          pih.*,
+          (SELECT `name` FROM jaco_main_rolls.`users` u WHERE u.`id` = pih.`creator_id` ) as user_name
+        FROM
+          jaco_main_rolls.`points_pay_hist` pih
+        WHERE
+          pih.`point_id` = :point_id
+        ORDER BY
+          pih.`date_time_update` ASC
+      ', ['point_id' => $point_id]) ?? [];
+    }
+
+    static function get_point_sett_hist(int $point_id): array
+    {
+      return DB::select(/** @lang text */ '
+        SELECT
+          pih.*,
+          (SELECT `name` FROM jaco_main_rolls.`users` u WHERE u.`id` = pih.`creator_id` ) as user_name
+        FROM
+          jaco_main_rolls.`points_settings_hist` pih
+        WHERE
+          pih.`point_id` = :point_id
+        ORDER BY
+          pih.`date_time_update` ASC
+      ', ['point_id' => $point_id]) ?? [];
+    }
+
+    static function insert_new_point(int $city_id, string $addr, string $xy_point): false|string
+    {
+      DB::insert(/** @lang text */ '
+        INSERT INTO
+          jaco_main_rolls.`points` (city_id, addr, xy_point)
+        VALUES (
+          "'.$city_id.'",
+          "'.$addr.'",
+          "'.$xy_point.'"
+        )
+      ');
+
+      return DB::getPdo()->lastInsertId();
+    }
+
+    // для тестов получить все не активные точки
+    static function get_points_none_active(): array
+    {
+      return DB::select(/** @lang text */ '
+        SELECT
+          p.`base`,
+          CONCAT(c.`name`, ", ", p.`addr`) as name,
+          p.`id` as id,
+          p.`city_id`
+        FROM
+          jaco_main_rolls.`points` p
+          LEFT JOIN jaco_main_rolls.`cities` c
+            ON
+              c.`id`=p.`city_id`
+        WHERE
+          p.`is_active`=0
+        ORDER BY
+          p.`city_id`
+     ') ?? [];
+    }
+
+    static function get_name_zone(int $zone_id): object
+    {
+      return DB::selectOne(/** @lang text */ '
+        SELECT
+          `name`
+        FROM
+          jaco_main_rolls.`points_zone`
+        WHERE
+          `id`=:zone_id
+      ', ['zone_id' => $zone_id]);
+    }
+
+    static function get_one_events_new(int $zone_id, string $date): object|null
+    {
+      return DB::selectOne(/** @lang text */ '
+        SELECT
+          *
+        FROM
+          jaco_site_rolls.`events_new`
+        WHERE
+          `date` = "'.$date.'"
+            AND
+          `zone_id` = "'.$zone_id.'"
+        ORDER BY
+          `id` DESC
+      ');
+    }
+
+    static function delete_event_new(int $zone_id, string $date, int $type): void
+    {
+      DB::delete(/** @lang text */ '
+        DELETE FROM
+          jaco_site_rolls.`events_new`
+        WHERE
+         `date`="'.$date.'"
+            AND
+         `zone_id`="'.$zone_id.'"
+            AND
+         `type`="'.$type.'"
+      ');
+    }
+
+    static function insert_point_zone(int $point_id, int $zone_id, int $creator_id, int $is_active, string $date_time_update): string|false
+    {
+      DB::insert(/** @lang text */ '
+        INSERT INTO
+          jaco_main_rolls.`points_zone_hist` (point_id, zone_id, creator_id, is_active, date_time_update)
+        VALUES (
+          "'.$point_id.'",
+          "'.$zone_id.'",
+          "'.$creator_id.'",
+          "'.$is_active.'",
+          "'.$date_time_update.'"
+        )
+      ');
+
+      return DB::getPdo()->lastInsertId();
+    }
+
+    static function get_active_zone(int $zone_id, string $date): object|null
+    {
+      return DB::selectOne(/** @lang text */ '
+        SELECT
+          `id`
+        FROM
+          jaco_site_rolls.`events_new`
+        WHERE
+          `date` = "'.$date.'"
+            AND
+          `zone_id` = "'.$zone_id.'"
+            AND
+          `type` = 5
+        ORDER BY
+          `id` DESC
+      ');
+    }
+
+    static function get_point_zone_hist(int $point_id): array
+    {
+      return DB::select(/** @lang text */ '
+        SELECT
+          pih.*,
+          CONCAT(pz.`name`, " ( зона ", pz.`id`, " )") as zone_name,
+          (SELECT `name` FROM jaco_main_rolls.`users` u WHERE u.`id` = pih.`creator_id` ) as user_name
+        FROM
+          jaco_main_rolls.`points_zone_hist` pih
+          LEFT JOIN jaco_main_rolls.`points_zone` pz
+						ON
+          pz.`id`=pih.`zone_id`
+        WHERE
+          pih.`point_id` = :point_id
+        ORDER BY
+          pih.`date_time_update` ASC
+      ', ['point_id' => $point_id]) ?? [];
+    }
+
+    static function get_acces(int $app_id, int $module_id): array
+    {
+      return DB::select(/** @lang text */ '
+        SELECT
+          ag.`param`,
+          atg.`value`
+        FROM
+          jaco_main_rolls.`appointment_group` ag
+          LEFT JOIN jaco_main_rolls.`appointment_template_group` atg
+            ON
+              atg.`group_id`=ag.`id`
+        WHERE
+          atg.`appointment_id`=:app_id
+            AND
+          ag.`module_id`=:module_id
+      ', ['app_id' => $app_id, 'module_id' => $module_id]) ?? [];
     }
 
 }

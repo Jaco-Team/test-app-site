@@ -120,6 +120,9 @@ Route::middleware([CheckToken::class])->group(function () {
       Route::any('/save_edit_point_sett', [Controller_cafe_edit::class, 'save_edit_point_sett']);
       Route::any('/save_edit_point_rate', [Controller_cafe_edit::class, 'save_edit_point_rate']);
       Route::any('/save_edit_point_pay', [Controller_cafe_edit::class, 'save_edit_point_pay']);
+      Route::any('/stop_cafe', [Controller_cafe_edit::class, 'stop_cafe']);
+      Route::any('/save_new_point', [Controller_cafe_edit::class, 'save_new_point']);
+      Route::any('/stop_zone', [Controller_cafe_edit::class, 'stop_zone']);
     });
 
 });
