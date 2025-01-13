@@ -20,6 +20,8 @@ use App\Http\Controllers\Controller_vendor_mini;
 use App\Http\Controllers\Controller_site_clients;
 use App\Http\Controllers\Controller_cafe_edit;
 
+use App\Http\Controllers\Controller_module_stat_order;
+
 Route::get('/', [IndexController::class, 'index'])->name('home');
 Route::get('/one', [IndexController::class, 'get_last'])->name('home');
 
@@ -122,6 +124,12 @@ Route::middleware([CheckToken::class])->group(function () {
       Route::any('/stop_cafe', [Controller_cafe_edit::class, 'stop_cafe']);
       Route::any('/save_new_point', [Controller_cafe_edit::class, 'save_new_point']);
       Route::any('/stop_zone', [Controller_cafe_edit::class, 'stop_zone']);
+    });
+
+    Route::prefix('module_stat_order')->group(function () {
+      Route::any('/get_all', [Controller_module_stat_order::class, 'get_all']);
+      Route::any('/get_stat_days', [Controller_module_stat_order::class, 'get_stat_days']);
+      Route::any('/get_stat_month', [Controller_module_stat_order::class, 'get_stat_month']);
     });
 
 });
