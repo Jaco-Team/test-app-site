@@ -48,7 +48,7 @@ class SiteClientsExport implements FromCollection, WithMapping, WithHeadings, Wi
         $order->is_delete == 0 ? $order->status : 'Удален',
         $order->order_price,
         $order->type_pay,
-        '',
+        $order->driver ?? '',
       ];
     });
 
@@ -72,7 +72,7 @@ class SiteClientsExport implements FromCollection, WithMapping, WithHeadings, Wi
       'L' => 15,
       'M' => 10,
       'N' => 10,
-      'O' => 10
+      'O' => 18
     ];
   }
 
