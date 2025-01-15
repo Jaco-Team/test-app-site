@@ -22,6 +22,8 @@ use App\Http\Controllers\Controller_cafe_edit;
 
 use App\Http\Controllers\Controller_module_stat_order;
 
+use App\Http\Controllers\Controller_sklad_items_module;
+
 Route::get('/', [IndexController::class, 'index'])->name('home');
 Route::get('/one', [IndexController::class, 'get_last'])->name('home');
 
@@ -130,6 +132,18 @@ Route::middleware([CheckToken::class])->group(function () {
       Route::any('/get_all', [Controller_module_stat_order::class, 'get_all']);
       Route::any('/get_stat_days', [Controller_module_stat_order::class, 'get_stat_days']);
       Route::any('/get_stat_month', [Controller_module_stat_order::class, 'get_stat_month']);
+    });
+
+    Route::prefix('sklad_items_module')->group(function () {
+      Route::any('/get_all', [Controller_sklad_items_module::class, 'get_all']);
+      Route::any('/get_all_for_new', [Controller_sklad_items_module::class, 'get_all_for_new']);
+      Route::any('/get_search', [Controller_sklad_items_module::class, 'get_search']);
+      Route::any('/get_one', [Controller_sklad_items_module::class, 'get_one']);
+      Route::any('/save_check', [Controller_sklad_items_module::class, 'save_check']);
+      Route::any('/get_one_hist', [Controller_sklad_items_module::class, 'get_one_hist']);
+      Route::any('/check_art', [Controller_sklad_items_module::class, 'check_art']);
+      Route::any('/save_edit', [Controller_sklad_items_module::class, 'save_edit']);
+      Route::any('/save_new', [Controller_sklad_items_module::class, 'save_new']);
     });
 
 });
